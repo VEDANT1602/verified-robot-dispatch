@@ -1,0 +1,7 @@
+* text=auto eol=lf
+*.pdf binary
+*.png binary
+*.csv -text
+*.dat -text
+/run.py -text
+/soma_modules/** -text

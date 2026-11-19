@@ -1,30 +1,14 @@
-# A delivery receipt for two-robot dispatch under uncertain package identity
+# Did the dock receive the right parcel?
 
-Two robots reach the dock. Did either bring the item on the order? This experiment tracks dock arrival, correct parcel receipt and time in transit separately. Taking the worst case on each route and then averaging reverses the ranking of two dispatch policies compared with scoring a whole shift under one common tag reliability.
+On open-floor layout 300000, the visit-only dispatch sends one robot straight to the dock and leaves the other idle. It scores a dock visit in five steps. The receiving inventory is empty. On the very same layout, the midpoint dispatch sends a robot for parcel A and another for B. The routes cost 18 team steps and the dock has the requested item whichever tag is correct. [Visit-only receipt](results.csv?plain=1#L3) · [Two-parcel receipt](results.csv?plain=1#L9)
 
-[Read the manuscript (PDF)](manuscript.pdf) · [Read the Markdown version](manuscript.md) · [Inspect the results](results.csv)
+A path replay records which item arrives with each robot. This separates arrival, expected correct receipt, and travel. Across 1,800 simulated layouts, the visit-only policy reaches the dock on 98.56% and delivers zero correct parcels. With equally likely parcel identities, midpoint dispatch has 55% expected correct receipt at 11.99 mean team steps. [Inventory update](run.py#L79) · [Full dispatch records](results.csv)
 
-## Experiment
+## One tag reliability per shift or one per layout?
 
-Two robots can stay idle, travel to a common dock, or collect one of two possible parcels en route. A breadth-first search computes the travel distances. The experiment enumerates feasible joint plans, then walks the selected paths and checks the inventory delivered to the dock. Each of the open-floor, clutter and single-doorway families contributes 600 seeded layouts. All five planners see the same feasible routes on each layout.
+The wide robust policy protects against tag reliability anywhere from 0.1 to 0.9. Scoring the worst case separately on each layout makes it look better than midpoint, with mean utilities of 0.2091 and 0.1666. Requiring one common tag reliability across the entire shift reverses the ordering to 0.2312 and 0.3202. The model of uncertainty determines which number answers the dispatch question.
 
-The uncertain parameter is the probability that A is the requested parcel. With that probability fixed at `p`, the expected correct receipt is `p × A_receipt + (1 − p) × B_receipt`. The multi-objective utility also rewards a dock visit and charges for team travel. The midpoint planner fixes `p` at 0.5. The wide robust planner protects each layout against every value from 0.1 to 0.9. A narrow robust planner uses 0.3 to 0.7. The other two planners use a dock-visit objective and an optimistic tag probability of 0.9.
-
-## Findings
-
-Dock visit is the percentage of the 1,800 layouts in which a robot reached the dock. Correct receipt is the expected percentage of orders filled when the parcel identities are equally likely. Mean team steps counts the combined travel of both robots per layout.
-
-| Planner | Dock visit | Correct receipt | Mean team steps |
-| --- | ---: | ---: | ---: |
-| Visit only | 98.56% | 0.00% | 4.78 |
-| Optimistic tag | 90.39% | 31.78% | 7.57 |
-| Midpoint | 93.17% | 55.00% | 11.99 |
-| Narrow robust | 93.17% | 52.81% | 11.68 |
-| Wide robust | 86.61% | 36.64% | 9.26 |
-
-On the 587 layouts where both parcels could reach the dock, the wide robust planner always delivered both. On the remaining 1,213, its expected receipt fell to 5.98%, compared with 35.16% for the midpoint policy. For a single tag reliability shared across the shift, the minimum mean utility was 0.3202 for midpoint and 0.2312 for wide robust. Applying the minimum on each layout gave 0.1666 and 0.2091, respectively.
-
-These are finite-grid results. The model permits robots to share a cell and assumes deterministic travel and correct inventory records. A shift-wide robust optimizer, noisy scanners and measured dispatch logs would test different aspects of the finding.
+The search considers 600 seeded layouts in each of three map families. Travel is deterministic, robots may share a cell, and dock inventory is read without error. [Objective and assumptions](manuscript.md) · [Paper PDF](manuscript.pdf)
 
 ## Reproduce
 

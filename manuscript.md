@@ -6,6 +6,8 @@ vedant.thaker1602@gmail.com
 
 Teaching note
 
+**Research period (author-reported)** · August 2–13, 2026 &nbsp; | &nbsp; **Manuscript revised** · November 21, 2026
+
 ### Abstract
 
 A pick station can receive an unknown mix of orders in two different ways. Tickets drawn from one randomly shuffled batch have the same marginal type probability at both stations. Separate queues can have different mixtures. For a fixed dispatch plan with affine receipt utility, the difference between the two worst-case scores is determined by cancellation of slopes across stations. In this teaching example the batch contains ten tickets. Each of two stations draws one ticket, and eight stay in the batch. The four available action pairs can be enumerated exactly. Blind draws from the same batch favor a delivery at each station. Separate station-specific queues favor empty dock visits under the same payoffs.

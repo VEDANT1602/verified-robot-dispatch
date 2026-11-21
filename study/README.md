@@ -1,4 +1,4 @@
-# Two-station dispatch under a pooled batch composition
+# Teaching example: two stations draw from ten tickets
 
 Run `python dispatch_note.py` from this directory using Python 3.10 or later. Only the standard library is required. The program regenerates ticket_scores.csv from scratch. It tests all four action combinations, every admissible station-agnostic A count from one to nine, and all 90 ordered assignments of two distinct positions from a ten-ticket batch. It compares ticket enumeration with the affine expectation and checks the exact coupling gap. The decision example is constructed. No customer or robot field data were used. The original route study is public at commit 0075997d6e53debfeaefb7c6a4de02b5d613f966 of VEDANT1602/verified-robot-dispatch; neither the route simulation nor its output is needed here.
 

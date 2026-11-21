@@ -1,7 +1,7 @@
 cff-version: 1.2.0
 message: "Please cite this software if you use it."
 type: software
-title: "When a shared batch composition changes a dispatch decision"
+title: "A two-station dispatch example with a shared ten-ticket batch"
 authors:
   - family-names: Thaker
     given-names: Vedant

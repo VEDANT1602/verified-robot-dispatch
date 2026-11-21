@@ -5,3 +5,7 @@ The research question and author-supplied disclosures are attributed to Vedant T
 Exact rational enumeration reproduced all four scores for the two ambiguity sets and all nine admissible batch compositions. It averages all 90 ordered assignments of two distinct ticket positions for each composition.
 
 The supplement README identifies the inputs and computations needed to inspect the numerical results. Earlier public material is retained at https://github.com/VEDANT1602/verified-robot-dispatch/tree/0075997d6e53debfeaefb7c6a4de02b5d613f966 .
+
+## Current work
+
+Vedant Thaker is the sole author and set the research question. OpenAI Codex assisted with checking the proof, enumerating the ticket assignments and drafting the theory note.

@@ -1,0 +1,5 @@
+station_1_A,station_2_B,separate_exact,shared_exact,separate_decimal,shared_decimal
+0,0,7/40,7/40,0.175,0.175
+0,1,33/200,33/200,0.165,0.165
+1,0,33/200,33/200,0.165,0.165
+1,1,31/200,19/40,0.155,0.475

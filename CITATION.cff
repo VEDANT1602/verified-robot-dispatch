@@ -1,7 +1,7 @@
 cff-version: 1.2.0
-message: "Please cite this software when reusing its methods."
+message: "Please cite this software if you use it."
 type: software
-title: "When parcel probabilities are shared: an exact robustness gap for two-robot dispatch"
+title: "When a shared batch composition changes a dispatch decision"
 authors:
   - family-names: Thaker
     given-names: Vedant

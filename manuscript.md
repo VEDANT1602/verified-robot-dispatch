@@ -1,68 +1,121 @@
-# A delivery receipt for two-robot dispatch under uncertain package identity
+# When parcel probabilities are shared: an exact robustness gap for two-robot dispatch
 
 **Vedant Thaker**  
-Working paper · 18 November 2026
+Independent Researcher, Jeffersonville, Indiana, United States  
+Correspondence: vthaker1@asu.edu  
+21 November 2026
 
 ## Abstract
 
-Both robots can reach the dock while the requested package stays on its shelf. Five planning strategies face the same routes on 1,800 generated layouts. A separate receipt check establishes which of two possible packages reaches the dock under each possible requested identity. Across three layout families, a visit-only strategy reaches the dock on 98.56% of layouts and delivers no packages. With equally likely identities, a planner using midpoint weights delivers the requested package with probability 55.00%. Maximizing the minimum utility on each layout lowers that probability to 36.64%. The latter planner takes fewer steps, achieves higher worst-case utility under its own criterion, and delivers both items wherever that is feasible. The delivery loss arises mainly on the remaining 1,213 layouts, where a single affordable delivery can still be worth attempting under shared population-level uncertainty. The unit over which the planner takes its minimum changes what reaches the dock.
+A dispatcher with uncertain order identity can protect each order against its own worst-case parcel probability or protect a batch against one common probability. For affine receipt utility we derive the exact difference between these criteria. It is positive precisely when a plan favors one parcel on some positive-weight layouts and the other parcel on others, provided the probability interval has positive width. A two-layout example then reverses the ordering of two plans: empty visits maximize the order-wise minimum, whereas opposite single-parcel deliveries maximize the shared minimum. On 1,800 generated layouts, order-wise mean worst utilities were 0.2091 for wide-interval dispatch and 0.1666 for midpoint dispatch; their shared-parameter minima were 0.2312 and 0.3202. Eighteen equal-cost route exchanges balanced the receipt counts and attained the exact finite-panel optimum of 0.3266. The proof concerns a family of ambiguity sets, and the examples use specified conditional probabilities rather than measured scanner reliabilities.
 
-## 1. Which event counts as success?
+## 1. What can vary from one order to the next?
 
-A dock beacon can confirm that a robot arrived. An inventory record can confirm that it unloaded parcel A. Neither event alone establishes that A was the parcel on the order. This distinction matters when checking a controller whose inputs contain an uncertain identity tag. It also permits an exact test. With only two candidate parcels, both possible outcomes of any route can be scored without sampling package identities.
+Two robots share one dock and two labeled candidate parcels. A route that unloads only A succeeds exactly when A was requested. If orders share a common probability of requesting the indicated parcel, sending A on one layout and B on another can offset exposure to an erroneous indication. That protection disappears if a different unfavorable probability can apply to every order.
 
-Leike et al. used hidden performance functions to expose gaps between observed reward and intended behavior in small environments [1]. Skalse et al. characterized when optimizing a proxy can lower true return [2]. Liu, Sun and Zheng derived robust optimization over correlated proxy rewards and studied how known reward features change the optimization problem [3]. Their formulation estimates policies under a correlation constraint. The dispatch model here uses an explicit interval on one identity probability and searches a finite list of routes. This simpler setting makes a different comparison possible. Given the exact route chosen, how much of a change in delivery comes from the choice of proxy, and how much comes from the choice to protect each layout individually?
+Gerkey and Matarić classify multi-robot allocation by robot, task and assignment requirements [1]. Our robots choose one route each, may idle, and cannot both claim the same parcel; the uncertainty concerns which physical receipt fills the order. Wiesemann, Kuhn and Rustem distinguish uncertainty sets that couple parameters across decisions from rectangular sets that permit independent variation [2]. Here the effect can be calculated in closed form for fixed finite dispatch plans, including exactly when it changes a ranking.
 
-## 2. Dispatch model
+## 2. Conditional order identity and a replayable route
 
-Each map has two start cells, two package cells and one dock, all distinct. The robots move simultaneously by unit steps along open cells of a four-neighbor grid. Each robot may stay put, drive straight to the dock, or collect one package and deliver it. A pickup and an unload each cost one step. Two robots cannot claim the same package. Both may use the same cell at the same time, including the dock. Breadth-first search gives the shortest distance for each route. A joint plan is feasible if both routes meet the map's time limit. Total cost counts steps across the team, even when the robots move in parallel.
+A simple generative interpretation starts with two physical identities. Conditional on layout i, let the true request Z be equally likely to be either physical parcel; let an observed tag T name Z with probability q and the other parcel with probability 1 − q, symmetrically. Call the parcel named by T “A” and the other one “B.” Then pᵢ = Pr(Z = T | T, i) = q. With an unequal prior or asymmetric tag errors, the equality need not hold: if a physical parcel has prior probability λ and a symmetric classifier names it, its posterior is qλ/[qλ + (1 − q)(1 − λ)]. The simulation enumerates outcomes conditional on a tag with A already designated. It generates maps and routes and integrates out the request; it draws no scanner observations or calibrating tag labels.
 
-The open family uses an 8 by 8 grid with independent 10% obstacle probability and a 13-step limit. Clutter uses a 9 by 9 grid, 23% obstacles and 14 steps. Door uses a 10 by 10 grid, 8% obstacles and 15 steps. It also replaces the central column with a wall containing one open doorway. Each family contributes 600 independently seeded maps. Disconnected samples are redrawn until the five marked cells communicate. Holding out maps here means that no planner parameters are fitted on these maps. All policies receive the complete evaluation map at decision time. The three families change several properties together, so their differences describe operating conditions rather than isolated obstacle effects.
+The two starts, two parcel cells and dock occupy five distinct locations in one connected component of each accepted map. Unused cells may lie in other components. The open family has an 8 × 8 grid, obstacle probability 0.10 and a 13-step deadline. Clutter uses 9 × 9, 0.23 and 14. Door uses 10 × 10, 0.08 and 15, with the central column replaced by a wall with one opening. Independent seeds generate 600 layouts per family, starting at 300000, 310000 and 320000. Disconnected marked cells trigger a redraw. Policies see the complete map at decision time. No parameters were fitted on the panel. Differences across families combine size, obstacle density, deadline and, for Door, topology.
 
-Let V indicate any dock visit, A and B indicate completed receipts at the dock, and S count total steps. The tag assigns probability p to A being the requested parcel. Receipts are deterministic route unloads. A separate replay walks the selected paths, loads the item present at the pickup cell and checks the dock inventory against the scored route. Evaluating both possible requested identities then gives expected receipt D(p) = pA + (1 - p)B. The planning utility is U(p) = 0.2V + 0.8D(p) - 0.025S. A direct visit earns a small service credit even when the order stays open. These weights define the decision problem. The results report V, D and S separately so that readers can apply a different valuation.
+Each robot can stay, travel directly to the dock or collect one parcel and unload it at the dock. Cardinal moves, pickup and unload each cost one step. The deadline applies to each robot separately. Team travel S is the sum of both route lengths. Robots may share any cell, including the dock, and cannot claim the same parcel. Breadth-first distances determine route feasibility. A second path traversal follows each selected route, tracks cargo and checks dock inventory and travel against the enumerated plan.
 
-The visit policy maximizes V - 0.025S. The tag and midpoint policies maximize U at p = 0.9 and 0.5, respectively. The wide robust planner maximizes the minimum of U over p from 0.1 to 0.9. The narrow robust planner uses 0.3 to 0.7. Utility is affine in p, so checking the two endpoints is exact. Ties use lower team travel followed by a fixed route ordering. All decisions are deterministic. The verifier reports D under p = 0.1, 0.5 and 0.9. The false-success rate is V - D, expressed per assigned order. A nonvisit is never counted as a false success.
+For fixed route i, let Vᵢ denote any dock visit and Aᵢ, Bᵢ indicate receipts of the designated and alternative parcels. Correct receipt has expectation Dᵢ(p) = pAᵢ + (1 − p)Bᵢ. The descriptive utility Uᵢ(p) = 0.2Vᵢ + 0.8Dᵢ(p) − 0.025Sᵢ awards a small service credit for a visit and charges Sᵢ team steps. These illustrated values specify preferences in the example. No facility supplied a service valuation.
 
-## 3. Does guarding both identities improve delivery?
+## 3. The exact gap between two worst cases
 
-Table 1 averages over all 1,800 layouts with equal weight. The three receipt columns use the same chosen routes. Worst utility means the mean across layouts of the lower endpoint utility on the wide interval. It includes travel and dock credit.
+Let i index finitely many layouts with weights wᵢ > 0 summing to one. Fix a plan π choosing one feasible route per layout. Write Uᵢ(p) = Uᵢ(m) + bᵢ(p − m), where [m − h, m + h] is the uncertainty interval, h ≥ 0 and bᵢ = 0.8(Aᵢ − Bᵢ) under the illustrated valuation. Let M be the weighted mean of Uᵢ(m), K the weighted mean of |bᵢ| and J the absolute value of the weighted mean of bᵢ.
 
-| Planner | Dock visit % | Receipt at .1 % | Receipt at .5 % | Receipt at .9 % | Steps | Worst utility |
+Proposition. The order-wise minimum L(π) over independent layout probabilities equals M − hK. The shared minimum C(π), with one p on every layout, equals M − hJ. Hence C(π) − L(π) = h(K − J). To prove this, the minimum of each affine line over the interval is its midpoint value minus h times its absolute slope. Applying this once per line gives L; applying it to their weighted sum gives C. The triangle inequality gives K ≥ J. Equality holds if h = 0 or all nonzero slopes on positive-weight layouts have the same sign. This includes plans that deliver both parcels or neither everywhere.
+
+Strict ranking reversal has an exact criterion. Write ΔM, ΔK and ΔJ for quantities of plan X minus those of plan Y. The simultaneous conditions L(X) > L(Y) and C(X) < C(Y) hold exactly when hΔK < ΔM < hΔJ. This follows by substituting the two formulas. A positive coupling gap for one plan alone does not guarantee reversal: the difference between the two plans’ gaps must exceed X’s order-wise advantage.
+
+## 4. A two-layout reversal with the same travel prices
+
+Give two layouts equal weight. Both offer an empty direct visit in one step. Each also offers a five-step visit carrying a single parcel: only A on the first layout, only B on the second. Use the baseline utility and p between 0.1 and 0.9. Empty travel earns 0.175 in either layout. Delivery has endpoint scores 0.155 and 0.795, in opposite order across layouts. Delivering in both layouts therefore guarantees only 0.155 per layout if the endpoint can vary, but its mean is 0.475 at every shared p. A mixed plan that delivers on just one layout has a minimum mean of 0.165 under either rule. Enumeration of the four plans proves both maxima for these restricted menus. The example requires no map sampling, route tie or numerical optimizer.
+
+## 5. Five dispatch rules on a seeded panel
+
+The visit-only policy maximizes V − 0.025S. The tag-favoring and midpoint rules maximize U at p = 0.9 and p = 0.5. Narrow and wide robustness maximize the minimum U over [0.3, 0.7] and [0.1, 0.9], respectively. The endpoint check is exact because U is affine in p. Equal scores to ten decimal places favor fewer steps and then the lexicographically greatest action pair. The route is selected once and evaluated at three probabilities. Each policy's worst utility below takes the minimum on each layout over the wide interval, then averages over 1,800 layouts.
+
+| Policy | Visit % | D(.1) % | D(.5) % | D(.9) % | Steps | Worst U |
 | --- | --- | --- | --- | --- | --- | --- |
 | Visit | 98.56 | 0.00 | 0.00 | 0.00 | 4.78 | 0.078 |
 | Tag | 90.39 | 9.16 | 31.78 | 54.40 | 7.57 | 0.042 |
 | Midpoint | 93.17 | 55.80 | 55.00 | 54.20 | 11.99 | 0.167 |
-| Narrow robust | 93.17 | 53.36 | 52.81 | 52.25 | 11.68 | 0.187 |
-| Wide robust | 86.61 | 37.11 | 36.64 | 36.17 | 9.26 | 0.209 |
+| Narrow | 93.17 | 53.36 | 52.81 | 52.25 | 11.68 | 0.187 |
+| Wide | 86.61 | 37.11 | 36.64 | 36.17 | 9.26 | 0.209 |
 
-The visit policy's zero receipts follow from its objective and the two handling steps required for a parcel. This is a positive control for the audit. The tag policy provides a more informative baseline. When A is correct nine times in ten, its receipt rate is within 0.20 percentage points of the midpoint's. When A is correct once in ten, its receipt rate falls to 9.16%. Recording only visits would hide that difference entirely.
+Table 1. Map-weighted outcomes under the baseline valuation. D is expected correct receipt.
 
-The wide robust planner improves on the optimistic tag policy when p is low. It also spends 2.73 fewer team steps per layout than the midpoint planner. Yet the midpoint scores higher on receipt at all three evaluation probabilities. At p = 0.5, 49.97% of all orders produce a false-success visit under wide robustness, compared with 38.17% under midpoint weights. The geometry imposes its own limit. An oracle given the true package identity, allowed to ignore travel cost but required to respect the deadline, can achieve at most 59.56% expected receipt at p = 0.5. This bound is computed separately for each item and layout.
+## 6. Single-parcel deliveries under a travel charge
 
-## 4. Where does the loss occur?
+At equal identity odds the midpoint–wide receipt gap was 18.36 percentage points. Treating layouts as independent generator draws within each equally weighted family, a paired normal approximation gives a 95% interval of 17.13 to 19.59 points. The standard error uses the within-family variance of paired differences divided by 600 and combines the three strata with weights of one third. The interval describes Monte Carlo error for this generator. Comparing policies within a layout preserves the actual unit of replication.
 
-Both parcels can be delivered together on 587 layouts. The wide robust planner always does so there. The midpoint planner's expected receipt in that stratum is 96.00%. On the other 1,213 layouts, the wide planner's expected receipt is 5.98%, against 35.16% for the midpoint. Consider one available package with no guarantee that the tag is right. Carrying that parcel adds at most 0.08 in worst-case receipt credit above the dock visit. Four extra steps cost 0.10. A short empty trip can therefore win an exact search. All candidate lists pass an independent inequality check that the selected wide plan attains at least the worst-case utility of every alternative on that layout.
+Both parcels could be delivered on 587 layouts. The wide planner did so in all 587. The midpoint planner achieved 96.00% expected receipt in that stratum. On the other 1,213 maps the corresponding rates were 5.98% and 35.16%. Relative to an empty visit, adding one parcel provides at most 0.08 of worst-case credit at the baseline weights. Four more steps cost 0.10, enough to favor an empty visit. At p = 0.5 the false-success rates were 49.97% for wide and 38.17% for midpoint. An oracle given the identity in advance, subject to the deadline but free to ignore travel cost, achieved a 59.56% upper bound on expected receipt.
 
-The opportunity to hedge differs by family. Both parcels can arrive on 46.50% of open layouts, 31.33% of clutter layouts and 20.00% of door layouts. At p = 0.5 the wide planner's receipt rates in those families are 49.75%, 35.33% and 24.83%, respectively. The corresponding midpoint rates are 66.58%, 54.92% and 43.50%. These map-conditional comparisons avoid treating the three identity settings or five policies as independent trials. The supplied records retain each seed for paired reanalysis.
+Two-parcel delivery was feasible on 46.50% of open, 31.33% of clutter and 20.00% of door layouts. At p = 0.5 the wide policy delivered on average with probabilities of 49.75%, 35.33% and 24.83%. For midpoint those figures were 66.58%, 54.92% and 43.50%.
 
-## 5. Interpretation and limits
+## 7. Reoptimizing the routes as valuations change
 
-There are two possible operational meanings for an uncertain tag. One system might suffer a different failure mechanism on every order. Another might use the same scanner throughout a shift, with a single unknown reliability over the batch. Taking the minimum separately on each layout permits the poorly matched identity distribution to change from order to order. Taking the minimum after averaging assumes a common p. Under that shared p, the minimum mean utility is 0.3202 for the midpoint planner and 0.2312 for the wide robust planner. Their ranking reverses when the minimum is taken per layout, as Table 1 shows. Roughly balanced package geometries give the midpoint planner nearly constant pooled delivery from one endpoint to the other. A shift-wide optimum was not fitted. The observed stability arises from the decisions on the sampled layouts.
+The sensitivity experiment reselected routes at every setting. It varied visit credit over 0, 0.2 and 0.4, awarded the remaining unit credit to receipt and charged 0, 0.0125, 0.025 or 0.05 per step. The baseline credits appear in the first four rows of Table 2. At zero travel price both planners could collect every affordable extra parcel, subject to the per-robot deadline, and tied on expected receipt at all three visit credits. At every positive travel price examined, midpoint earned higher expected receipt at p = 0.5. Travel savings were less consistent: with a 0.4 visit credit and a 0.025 step price, wide averaged 10.25 steps and midpoint 9.82. The remaining cells and utilities are supplied with the scripts.
 
-The verifier assumes every completed unload identifies its physical parcel perfectly. Persistent scanner errors, delayed receipts and correlated tag failures remain open tests. Collision avoidance, handoffs and online travel delays would alter which plans can deliver both parcels. The benchmark isolates the decision to attempt an order when its identity is uncertain. It supplies no evidence about physical robot performance. A useful next evaluation would replay parcel-level event logs, estimate whether tag errors cluster by scanner or by shift, then choose the unit at which to apply robustness before scoring receipt.
+| Visit credit | Receipt credit | Step price | Midpoint D(.5) % | Wide D(.5) % |
+| --- | --- | --- | --- | --- |
+| 0.2 | 0.8 | 0 | 56.31 | 56.31 |
+| 0.2 | 0.8 | 0.0125 | 56.31 | 48.36 |
+| 0.2 | 0.8 | 0.025 | 55.00 | 36.64 |
+| 0.2 | 0.8 | 0.05 | 25.36 | 8.17 |
+| 0 | 1 | 0.025 | 56.25 | 32.61 |
+| 0.4 | 0.6 | 0.025 | 44.39 | 36.25 |
 
-## Reproducibility
+Table 2. Selected cells from the 3 × 4 valuation grid. All cells use the same 1,800 maps.
 
-Run `python run.py` with Python 3.11 and the standard library. The script regenerates the maps, enumerates routes, checks feasible-receipt bounds and writes 27,000 policy-by-identity records to `results.csv`. Seeds begin at 300000, 310000 and 320000 in the three families and advance by one per layout. Published percentages use exact expectations over two identities, then average over layouts. They are simulation results.
+## 8. A certificate for the optimum on all 1,800 layouts
 
-## Research and writing assistance
+On the seeded panel L is 0.2091 for wide and 0.1666 for midpoint. Their mean-absolute slopes K were 0.06444 and 0.40000, respectively. The corresponding absolute mean slopes J were only 0.00933 and 0.01600. Thus h(K − J), with h = 0.4, adds approximately 0.0220 to wide and 0.1536 to midpoint when the parameter is shared. The resulting scores are 0.2312 and 0.3202. The gap formula explains why the ranking reverses.
 
-Vedant Thaker supplied the research brief and source materials. OpenAI Codex assisted with study design, implementation, execution, literature review and drafting. Clever Humanizer suggested edits to the abstract. The final wording was checked against the analysis.
+The shared-p optimum can be certified on this known panel. For any batch plan, its minimum mean utility cannot exceed its mean utility at p = 0.5. The sum of the layout-wise midpoint maxima therefore bounds every feasible batch plan. The published midpoint tie-break delivers A on 972 layouts and B on 1,008. There are 42 layouts on which an equal-cost A-only route can replace the chosen B-only route. Switching the first 18 eligible routes in family and seed order leaves midpoint utility unchanged and yields 990 receipts of each parcel. The aggregate utility is then constant in p and equals the upper bound, 0.3266389. Receipt probability at p = 0.5 and mean steps remain 0.55 and 11.99.
+
+Use an order-wise minimum if misses must be tolerable on each layout despite potentially different failure rates. A common endpoint is appropriate when one unknown reliability describes the entire batch and performance is judged in aggregate. With multiple scanners or shifts, group orders by the reliability mechanism and justify any pooling. The certificate uses the full layout panel. A sequential dispatcher that discovers orders only as they arrive would need an online rule and a fresh evaluation.
+
+## 9. Scope of the probability model
+
+Collision avoidance and handoffs can change which routes fit a deadline. The inventory replay assumes that a completed unload identifies the physical parcel without error. A scanner-dependent deployment needs parcel-level comparison against a trusted inventory, estimates of error clustering by scanner or shift, measured route times and a service valuation. Simulated receipt, team steps and the common-p certificate do not establish performance on a physical fleet.
+
+A shift, a scanner or a product family defines a plausible pooling unit only if tagged, independently verified orders support that level of calibration. A common underlying scanner accuracy with layout-specific priors can still yield different posterior probabilities. Without evidence about those priors, the shared-p and layout-wise calculations should be reported as alternative assumptions.
+
+## Data and code availability
+
+The original route data and implementation are available in the baseline repository. The supplement contains the original 27,000 records, source and environment locks, the route-price and batch-optimum scripts, and theory_check.py. From the supplement directory run python verify.py, python run.py, python verify.py, python weight_sensitivity.py, python batch_optimum.py and python theory_check.py. The last program uses exact rational arithmetic to generate theory_values.csv.
+
+[Pinned baseline](https://github.com/VEDANT1602/verified-robot-dispatch/tree/d13914af20963306897a9865bbc2d3b5d293f4fa) · [Revision code and data](https://github.com/VEDANT1602/verified-robot-dispatch/tree/main/revision/supplement) · [Preparation record](https://github.com/VEDANT1602/verified-robot-dispatch/blob/main/revision/PREPARATION.md)
+
+## Computational verification
+
+The regenerated baseline CSV matched its pinned digest and passed its verifier. Path replay checked actual inventory under selected routes. Independent rational endpoint evaluation in theory_check.py reproduced L and C and their closed forms for every archived policy, the balanced policy and all four decisions in the two-layout example. These calculations certify the finite examples under the stated model. The symbolic proof establishes the general claim for affine utilities.
+
+## Author contribution
+
+Vedant Thaker is the sole author. He designed the original two-robot dispatch study, wrote its manuscript, developed its original software, and requested the comparisons and checks reported in this revision.
+
+## Use of computational assistance
+
+OpenAI Codex assisted with the affine worst-case gap argument, exact arithmetic checks, route replay, shared-batch optimum certificate, and valuation sensitivity analyses, as well as literature checks and preparation of the revised text. The author set the research question and requested the revision.
+
+## Funding
+
+This research received no specific grant from any funding agency in the public, commercial, or not-for-profit sectors.
+
+## Competing interests
+
+The author declares no competing interests.
 
 ## References
 
-[1] J. Leike, M. Martic, V. Krakovna, P. A. Ortega, T. Everitt, A. Lefrancq, L. Orseau and S. Legg. AI Safety Gridworlds. 2017. https://arxiv.org/abs/1711.09883
+[1] B. P. Gerkey and M. J. Matarić. A Formal Analysis and Taxonomy of Task Allocation in Multi-Robot Systems. International Journal of Robotics Research 23(9), 939–954 (2004). https://doi.org/10.1177/0278364904045564
 
-[2] J. Skalse, N. H. R. Howe, D. Krasheninnikov and D. Krueger. Defining and Characterizing Reward Hacking. Revised preprint, 2025. https://arxiv.org/abs/2209.13085
-
-[3] Z. Liu, X. Sun and Z. Zheng. Robust Optimization for Mitigating Reward Hacking with Correlated Proxies. ICLR, 2026. https://www.cs.tulane.edu/~zzheng3/publication/reward_hacking_iclr26.pdf
+[2] W. Wiesemann, D. Kuhn and B. Rustem. Robust Markov Decision Processes. Mathematics of Operations Research 38(1), 153–183 (2013). https://doi.org/10.1287/moor.1120.0566

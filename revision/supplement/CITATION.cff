@@ -1,0 +1,9 @@
+cff-version: 1.2.0
+message: "Please use this citation when referring to the research software."
+type: software
+title: "A delivery receipt for two-robot dispatch under uncertain package identity"
+authors:
+  - family-names: Thaker
+    given-names: Vedant
+repository-code: "https://github.com/VEDANT1602/verified-robot-dispatch"
+abstract: "Two-robot route planning with uncertain package identity and independently checked delivery receipts."

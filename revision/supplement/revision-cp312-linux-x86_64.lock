@@ -1,0 +1,8 @@
+# Study 03 revision analyses — CPython 3.12.14, Linux x86_64, glibc 2.41.
+# Exact wheel hashes from the pip resolver; use a separate clean virtual environment.
+# All revision versions, including transitive versions, match the installed study-revision environment.
+# Installation: python -m pip install --require-hashes -r revision-cp312-linux-x86_64.lock
+--index-url https://pypi.org/simple
+--only-binary :all:
+
+# Python standard library only. No wheels are required.

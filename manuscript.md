@@ -12,7 +12,7 @@ A pick station can receive an unknown mix of orders in two different ways. Ticke
 
 ## Tickets from one batch
 
-Order grouping and routing are distinct choices in warehouse picking. Grouping orders by nearby storage locations, for example, can give different zones different order mixes [1]. Consider instead a contingency procedure in which two stations receive a uniformly shuffled pair of distinct tickets from a common batch of ten. Each ticket requests one of two interchangeable stock-keeping units, A or B. A controller must preposition a robot before the two ticket contents are revealed. It knows that at least one and at most nine tickets request A.
+Order grouping and routing are distinct choices in warehouse picking. Grouping orders by nearby storage locations, for example, can give different zones different order mixes [1]. Consider instead a contingency procedure in which two stations receive a uniformly shuffled pair of distinct tickets from a common batch of ten. Each ticket requests one of two distinct stock-keeping units, A or B. A controller must preposition a robot before the two ticket contents are revealed. It knows that at least one and at most nine tickets request A.
 
 If k tickets request A, each station has marginal probability p = k/10 of receiving an A request. The assignments are dependent because sampling is without replacement. Linearity of expected mean utility only requires the marginals. The common p is justified by the random assignment mechanism. Routing tickets by product type, revealing the first ticket before choosing the second action, or drawing from separate queues changes that argument. Here p denotes request composition. A scanner’s accuracy would need its own observation model.
 

@@ -1,10 +1,10 @@
 cff-version: 1.2.0
-message: "Please cite this software if you use it. Research period (author-reported): August 2–13, 2026. Manuscript revised November 21, 2026."
+message: "Cite this edition of the study software when using the included analysis."
 type: software
 title: "A two-station dispatch example with a shared ten-ticket batch"
 authors:
   - family-names: Thaker
     given-names: Vedant
 repository-code: "https://github.com/VEDANT1602/verified-robot-dispatch"
-date-released: 2026-11-21
+date-released: 2026-11-24
 license: MIT

@@ -8,4 +8,12 @@ The supplement README identifies the inputs and computations needed to inspect t
 
 ## Current work
 
-Vedant Thaker is the sole author and set the research question. OpenAI Codex assisted with checking the proof, enumerating the ticket assignments and drafting the theory note.
+Vedant Thaker is the sole author. He framed the dispatch question around a shared batch and chose to present it as a two-station teaching example. OpenAI Codex assisted with checking the proof, enumerating the ticket assignments and drafting the teaching note.
+
+## Date verification on November 22, 2026
+
+The author reports August 2–13, 2026 for the original work. The earliest public commit follows the end of the author-reported interval. Work during that interval cannot be verified from this history. The [first PDF commit](https://github.com/VEDANT1602/verified-robot-dispatch/commit/cfa7da95805570aed7f4af10f1a07f8bc11f7fe7), the November 20 review copy, and the November 21 and 22 manuscript versions are recorded separately in [the manuscript history](VERSION.md).
+
+## November 24 editorial work
+
+Vedant Thaker supplied the critique and requested this revision. OpenAI Codex assisted with the analysis checks and revised prose. The manuscript describes the study-specific work and its limitations.
